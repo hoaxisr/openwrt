@@ -1,0 +1,13 @@
+#!/bin/sh
+
+. /lib/functions/uci-defaults.sh
+
+board=$(board_name)
+
+case "$board" in
+keenetic,kn-3410)
+	ucidef_set_interfaces_lan_wan "eth0" "eth1"
+	;;
+esac
+
+exit 0

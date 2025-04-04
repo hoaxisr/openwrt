@@ -1,0 +1,15 @@
+#!/bin/sh
+
+. /lib/functions/uci-defaults.sh
+
+board=$(board_name)
+
+case "$board" in
+keenetic,kn-3410)
+	ucidef_set_led_default "power" "Power" "green:power" "1"
+	ucidef_set_led_netdev "wifi2" "WiFi 2.4GHz" "green:wifi2" "wlan0"
+	ucidef_set_led_netdev "wifi5" "WiFi 5GHz" "green:wifi5" "wlan1"
+	;;
+esac
+
+exit 0

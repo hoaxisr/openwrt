@@ -1,0 +1,56 @@
+name: Build OpenWRT for KN-3410
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout source
+      uses: actions/checkout@v4
+
+    - name: Установка зависимостей
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential clang flex bison g++ gawk gcc-multilib gperf libncurses-dev libssl-dev libxml-parser-perl make python3 unzip zlib1g-dev subversion file wget
+
+    - name: Клонирование OpenWRT
+      run: |
+        git clone https://github.com/openwrt/openwrt.git
+        cd openwrt
+        ./scripts/feeds update -a
+        ./scripts/feeds install -a
+
+    - name: Копирование файлов устройства
+      run: |
+        cp -rf target openwrt/target
+        cp -rf files openwrt/files
+        cp .config openwrt/.config
+
+    - name: Проверка конфигурации
+      run: |
+        echo "▶ Проверка наличия DTS, MK и .config"
+        test -f openwrt/target/linux/ramips/dts/mt7621_keenetic_kn-3410.dts || (echo "❌ DTS отсутствует!" && exit 1)
+        test -f openwrt/target/linux/ramips/image/mt7621.mk || (echo "❌ MK отсутствует!" && exit 1)
+        test -f openwrt/.config || (echo "❌ .config отсутствует!" && exit 1)
+        grep keenetic_kn-3410 openwrt/.config || (echo "❌ Устройство не включено в .config!" && exit 1)
+
+    - name: Вывод .config
+      run: |
+        cd openwrt
+        echo "📄 Вывод содержимого .config:"
+        grep 'CONFIG_TARGET' .config || true
+
+    - name: Сборка прошивки
+      run: |
+        cd openwrt
+        make defconfig
+        make -j$(nproc)
+
+    - name: Сохранение прошивки
+      uses: actions/upload-artifact@v4
+      with:
+        name: firmware
+        path: openwrt/bin/targets/ramips/mt7621/

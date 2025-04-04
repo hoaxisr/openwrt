@@ -1,0 +1,12 @@
+#!/bin/sh
+
+board=$(board_name)
+
+[ "$board" = "keenetic,kn-3410" ] || exit 0
+
+echo "KN-3410: preinit hook active"
+echo "LED: set green:power during boot"
+/usr/bin/env echo none > /sys/class/leds/green:power/trigger
+/usr/bin/env echo 1 > /sys/class/leds/green:power/brightness
+
+exit 0

@@ -1,0 +1,23 @@
+#!/bin/sh
+
+. /lib/functions/uci-defaults.sh
+
+board=$(board_name)
+
+case "$board" in
+keenetic,kn-3410)
+	uci set network.lan.proto='static'
+	uci set network.lan.ipaddr='192.168.1.1'
+	uci set network.lan.netmask='255.255.255.0'
+	uci set network.lan.ifname='eth0'
+	uci commit network
+
+	uci set wireless.@wifi-iface[0].ssid='Test'
+	uci set wireless.@wifi-iface[0].encryption='none'
+	uci set wireless.@wifi-iface[1].ssid='Test5G'
+	uci set wireless.@wifi-iface[1].encryption='none'
+	uci commit wireless
+	;;
+esac
+
+exit 0
