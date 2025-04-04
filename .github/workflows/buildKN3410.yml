@@ -1,4 +1,4 @@
-name: Build OpenWRT for KN-3410
+name: Build OpenWRT for KN-3410 (debug)
 
 on:
   workflow_dispatch:
@@ -38,13 +38,14 @@ jobs:
         cd openwrt
         grep 'CONFIG_TARGET' .config || true
 
-    - name: Сборка прошивки
+    - name: Сборка прошивки с подробным логом
       run: |
         cd openwrt
         make defconfig
-        make -j$(nproc)
+        make -j1 V=sc
 
     - name: Сохранение прошивки
+      if: success()
       uses: actions/upload-artifact@v4
       with:
         name: firmware
