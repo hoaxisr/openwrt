@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repo (содержимое fork)
+    - name: Checkout repo (fork с кастомными файлами)
       uses: actions/checkout@v4
 
     - name: Установка зависимостей
@@ -16,11 +16,11 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y build-essential clang flex bison g++ gawk gcc-multilib gperf libncurses-dev libssl-dev libxml-parser-perl make python3 unzip zlib1g-dev subversion file wget
 
-    - name: Клонирование OpenWRT и копирование файлов устройства
+    - name: Клонирование OpenWRT и копирование файлов
       run: |
         git clone https://github.com/openwrt/openwrt.git
-        cp -rf target openwrt/target
-        cp -rf files openwrt/files
+        cp -rf target/linux openwrt/target/
+        cp -rf files openwrt/
         cp .config openwrt/.config
         echo "✅ Копирование файлов завершено"
         ls openwrt/target/linux/ramips/dts | grep kn-3410 || echo "⛔ DTS не найден!"
