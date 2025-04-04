@@ -1,0 +1,4 @@
+boardname=keenetic,kn-3410
+
+ucidef_set_led_netdev "wifi2g" "WiFi 2.4GHz" "green:wifi2g" "wlan0"
+ucidef_set_led_netdev "wifi5g" "WiFi 5GHz" "green:wifi5g" "wlan1"

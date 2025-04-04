@@ -1,0 +1,5 @@
+boardname=keenetic,kn-3410
+
+ucidef_set_interfaces_lan_wan "lan1" ""
+ucidef_add_switch "switch0" \
+    "1:lan1"
