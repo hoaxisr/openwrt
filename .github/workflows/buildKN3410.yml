@@ -1,4 +1,4 @@
-name: Build OpenWRT for KN-3410 (debug)
+name: Build OpenWRT for KN-3410 (release)
 
 on:
   workflow_dispatch:
@@ -23,7 +23,6 @@ jobs:
         cp -rf files openwrt/
         cp .config openwrt/.config
         echo "✅ Копирование файлов завершено"
-        ls openwrt/target/linux/ramips/dts | grep kn-3410 || echo "⛔ DTS не найден!"
 
     - name: Проверка конфигурации
       run: |
@@ -33,16 +32,11 @@ jobs:
         test -f openwrt/.config || (echo "❌ .config отсутствует!" && exit 1)
         grep keenetic_kn-3410 openwrt/.config || (echo "❌ Устройство не включено в .config!" && exit 1)
 
-    - name: Вывод .config
-      run: |
-        cd openwrt
-        grep 'CONFIG_TARGET' .config || true
-
-    - name: Сборка прошивки с подробным логом
+    - name: Сборка прошивки (ускоренная)
       run: |
         cd openwrt
         make defconfig
-        make -j1 V=sc
+        make -j$(nproc)
 
     - name: Сохранение прошивки
       if: success()

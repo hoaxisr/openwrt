@@ -29,13 +29,13 @@
 			gpios = <&gpio 45 GPIO_ACTIVE_HIGH>;
 		};
 
-		wifi2 {
+		led_wifi2 {
 			label = "green:wifi2";
 			gpios = <&gpio 47 GPIO_ACTIVE_LOW>;
 			linux,default-trigger = "phy0tpt";
 		};
 
-		wifi5 {
+		led_wifi5 {
 			label = "green:wifi5";
 			gpios = <&gpio 48 GPIO_ACTIVE_LOW>;
 			linux,default-trigger = "phy1tpt";
@@ -68,6 +68,7 @@
 			#size-cells = <1>;
 
 			partition@0 {
+				compatible = "denx,uimage";
 				label = "firmware";
 				reg = <0x0 0x1ec0000>;
 			};
@@ -108,7 +109,7 @@
 			};
 
 			factory: partition@40000 {
-				label = "factory";
+				label = "rf-eeprom";
 				reg = <0x40000 0x10000>;
 				read-only;
 			};
@@ -124,6 +125,30 @@
 				read-only;
 			};
 
+			partition@ff0000 {
+				label = "dump";
+				reg = <0xff0000 0x10000>;
+				read-only;
+			};
+
+			partition@1000000 {
+				label = "u-state";
+				reg = <0x1000000 0x30000>;
+				read-only;
+			};
+
+			partition@1030000 {
+				label = "u-config_res";
+				reg = <0x1030000 0x10000>;
+				read-only;
+			};
+
+			partition@1040000 {
+				label = "rf-eeprom_res";
+				reg = <0x1040000 0x10000>;
+				read-only;
+			};
+
 			firmware2: partition@1050000 {
 				label = "firmware_2";
 				reg = <0x1050000 0xf60000>;
@@ -134,6 +159,35 @@
 				reg = <0x1fb0000 0x40000>;
 				read-only;
 			};
+		};
+	};
+};
+
+&mdio {
+	ethphy0: ethernet-phy@0 {
+		reg = <0>;
+	};
+};
+
+&gmac0 {
+	nvmem-cells = <&macaddr_factory_4>;
+	nvmem-cell-names = "mac-address";
+};
+
+&gmac1 {
+	status = "okay";
+	label = "wan";
+	phy-handle = <&ethphy0>;
+
+	nvmem-cells = <&macaddr_factory_28>;
+	nvmem-cell-names = "mac-address";
+};
+
+&switch0 {
+	ports {
+		port@1 {
+			status = "okay";
+			label = "lan1";
 		};
 	};
 };
@@ -155,36 +209,8 @@
 	wifi@0,0 {
 		compatible = "mediatek,mt76";
 		reg = <0x0000 0 0 0 0>;
-		mediatek,mtd-eeprom = <&factory 0x8000>;
+		mediatek,mtd-eeprom = <&factory 0x0400>;
 		ieee80211-freq-limit = <5000000 6000000>;
-	};
-};
-
-&gmac0 {
-	nvmem-cells = <&macaddr_factory_4>;
-	nvmem-cell-names = "mac-address";
-};
-
-&gmac1 {
-	status = "okay";
-	label = "wan";
-	phy-handle = <&ethphy0>;
-	nvmem-cells = <&macaddr_factory_28>;
-	nvmem-cell-names = "mac-address";
-};
-
-&mdio {
-	ethphy0: ethernet-phy@0 {
-		reg = <0>;
-	};
-};
-
-&switch0 {
-	ports {
-		port@1 {
-			status = "okay";
-			label = "lan1";
-		};
 	};
 };
 
